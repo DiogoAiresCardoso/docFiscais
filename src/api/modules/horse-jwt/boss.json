@@ -1,0 +1,13 @@
+{
+	"name": "horse-jwt",
+	"description": "",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./src",
+	"projects": [],
+	"dependencies": {
+		"github.com/andre-djsystem/hashlib4pascal": "^1.0.0",
+		"github.com/hashload/horse": "^v3.0.0",
+		"github.com/paolo-rossi/delphi-jose-jwt": "^v3.0.3"
+	}
+}

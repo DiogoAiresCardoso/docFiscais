@@ -1,0 +1,16 @@
+{
+	"name": "DocumentosFiscaisApi",
+	"description": "Api de documentos fiscais com ACBr",
+	"version": "1.0.0",
+	"homepage": "",
+	"mainsrc": "./",
+	"projects": [],
+	"dependencies": {
+		"github.com/academiadocodigo/simpleorm": "^2.02.09",
+		"github.com/hashload/horse": "^3.0.1",
+		"github.com/hashload/horse-compression": "^1.1.7",
+		"github.com/hashload/horse-jwt": "^2.0.9",
+		"github.com/hashload/jhonson": "^1.1.4",
+		"github.com/paolo-rossi/delphi-jose-jwt": "^v3.0.3"
+	}
+}

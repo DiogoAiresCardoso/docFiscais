@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{651D9A48-9975-4EDA-9941-C88AC5810E72}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="..\src\api\pkg\DocFiscaisApi.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="DocFiscaisApi">
+        <MSBuild Projects="..\src\api\pkg\DocFiscaisApi.dproj"/>
+    </Target>
+    <Target Name="DocFiscaisApi:Clean">
+        <MSBuild Projects="..\src\api\pkg\DocFiscaisApi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="DocFiscaisApi:Make">
+        <MSBuild Projects="..\src\api\pkg\DocFiscaisApi.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="DocFiscaisApi"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="DocFiscaisApi:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="DocFiscaisApi:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
