@@ -6,6 +6,8 @@ uses
   Generics.Collections, DB, DocFiscaisAttributes, SimpleAttributes, RTTI;
 
 type
+  TLerClassesRTTI = class;
+
   TLerClassesProperty = class
   private
     FTypeKind: TFieldType;
@@ -16,11 +18,16 @@ type
     FPK: boolean;
     FNotNull: boolean;
     FAutoInc: boolean;
+    FClasseFK: TClass;
+    FFK: boolean;
+    FoOwner: TLerClassesRTTI;
     { private declarations }
   protected
     { protected declarations }
   public
     { public declarations }
+    constructor Create(oOwner: TLerClassesRTTI);
+
     property Nome: string read FNome write FNome;
     property CampoBD: string read FCampoBD write FCampoBD;
     property Tamanho: integer read FTamanho write FTamanho;
@@ -29,6 +36,10 @@ type
     property PK: boolean read FPK write FPK default false;
     property NotNull: boolean read FNotNull write FNotNull default false;
     property AutoInc: boolean read FAutoInc write FAutoInc default false;
+    property FK: boolean read FFK write FFK default false;
+    property ClasseFK: TClass read FClasseFK write FClasseFK;
+
+    property Owner: TLerClassesRTTI read FoOwner;
   end;
 
   TLerClassesRTTI = class
@@ -37,7 +48,9 @@ type
     FOwner: TClass;
     FTabela: string;
     FSchema: string;
+    FCamposPK: string;
     FListProperty: TList<TLerClassesProperty>;
+    function GetCamposPK: string;
   protected
     { protected declarations }
     procedure LerPropriedades(poType: TRttiType);
@@ -50,6 +63,7 @@ type
     property Tabela: string read FTabela;
     property Schema: string read FSchema write FSchema;
     property Propriedades: TList<TLerClassesProperty> read FListProperty;
+    property CamposPK: string read GetCamposPK;
   end;
 
 implementation
@@ -71,6 +85,27 @@ begin
   FreeAndNil(FListProperty);
   FOwner := nil;
   inherited;
+end;
+
+function TLerClassesRTTI.GetCamposPK: string;
+var
+  I: Integer;
+begin
+  if FCamposPK <> '' then
+    Exit(FCamposPK);
+
+  Result := '';
+
+  for I := 0 to Pred(FListProperty.Count) do
+  begin
+    if FListProperty.Items[I].PK then
+    begin
+      if Result <> '' then
+        Result := Result + ', ';
+
+      Result := Result + FListProperty.Items[I].CampoBD;
+    end;
+  end;
 end;
 
 procedure TLerClassesRTTI.LerClasse;
@@ -108,7 +143,7 @@ begin
   // lendo propriedades
   for oProp in poType.GetProperties do
   begin
-    oPropriedade := TLerClassesProperty.Create;
+    oPropriedade := TLerClassesProperty.Create(Self);
     // nome
     oPropriedade.Nome := oProp.Name;
 
@@ -130,10 +165,23 @@ begin
 
       if oAtributo is AutoInc then
         oPropriedade.AutoInc := True;
+
+      if oAtributo is TFK then
+      begin
+        oPropriedade.FK := True;
+        oPropriedade.ClasseFK := TFK(oAtributo).ClasseFK;
+      end;
     end;
 
     FListProperty.Add(oPropriedade);
   end;
+end;
+
+{ TLerClassesProperty }
+
+constructor TLerClassesProperty.Create(oOwner: TLerClassesRTTI);
+begin
+  FoOwner := oOwner;
 end;
 
 end.

@@ -29,7 +29,7 @@ constructor TConfiguracaoApi.Create;
 begin
   FoConfiguracaoBD := TConfiguracaoBD.Create;
 
-  if not FoConfiguracaoBD.VerificarBancoDados then
+  if not FoConfiguracaoBD.ConfigurarBancoDados then
     Exit;
 
   FoConfiguracaoHorse := TConfiguracaoHorse.Create;

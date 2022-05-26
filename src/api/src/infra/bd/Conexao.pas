@@ -38,7 +38,6 @@ uses
 
 procedure TConexao.ConectarBanco;
 var
-  oDef: IFDStanConnectionDef;
   oParams: TFDPhysPGConnectionDefParams;
 begin
   TLogger.InserirLog(Self.ClassName, 'Tipo de banco: POSTGRESQL', False);
@@ -54,42 +53,12 @@ begin
   TLogger.InserirLog(Self.ClassName, 'Servidor: ' + oParams.Server, False);
   TLogger.InserirLog(Self.ClassName, 'Schema: ' + oParams.MetaDefSchema, False);
   TLogger.InserirLog(Self.ClassName, 'Database: ' + oParams.Database, False);
-
-  TLogger.InserirLog(Self.ClassName, 'Ativando conexão', False);
-
-
-
-//  oDef := FDManager.ConnectionDefs.AddConnectionDef;
-//  oDef.Name := sNameConnDef;
-//  oParams := TFDPhysPGConnectionDefParams(oDef.Params);
-//  oParams.DriverID := 'PG';
-//  oParams.Database := 'docFiscais';
-//  oParams.UserName := 'postgres';
-//  oParams.Password := 'postgres';
-//  oParams.Server := '127.0.0.1';
-//  oParams.MetaDefSchema := 'doc';
-//  oDef.MarkPersistent;
-//  oDef.Apply;
-//
-//  TLogger.InserirLog(Self.ClassName, 'Servidor: ' + oParams.Server, False);
-//  TLogger.InserirLog(Self.ClassName, 'Schema: ' + oParams.MetaDefSchema, False);
-//  TLogger.InserirLog(Self.ClassName, 'Database: ' + oParams.Database, False);
-//
-//  TLogger.InserirLog(Self.ClassName, 'Ativando conexão', False);
-//  FDManager.Active := True;
-  TLogger.InserirLog(Self.ClassName, 'Conexão ativa', False);
 end;
 
 constructor TConexao.Create;
 begin
   TLogger.InserirLog(Self.ClassName, 'Iniciando conexao com o banco');
   FDConn := TFDConnection.Create(nil);
-//  FDManager := TFDManager.Create(nil);
-
-
-//  FDManager.ConnectionDefFileName := '';
-//  FDManager.ConnectionDefFileAutoLoad := False;
-
   FDPhysPgDriverLink := TFDPhysPgDriverLink.Create(nil);
   ConectarBanco;
 end;
@@ -107,7 +76,7 @@ var
 begin
   FDQuery := TFDQuery.Create(nil);
 
-  FDQuery.Connection := FDConn;
+  FDQuery.Connection := GetConnection;
 
   FDQuery.SQL.Clear;
   FDQuery.SQL.Add(psQuery);
@@ -118,14 +87,7 @@ end;
 
 function TConexao.GetConnection: TFDCustomConnection;
 begin
-  if FDConn.Connected then
-  begin
-    Exit(FDConn);
-  end;
-
-  FDConn.Connected := True;
-
-  Result := FDConn;
+  Result := FDConn.CloneConnection;
 end;
 
 end.

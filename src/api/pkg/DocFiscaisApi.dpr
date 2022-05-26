@@ -14,7 +14,11 @@ uses
   DocFiscaisConfEntity in '..\src\modules\docFiscaisConf\entity\DocFiscaisConfEntity.pas',
   DocFiscaisAttributes in '..\domain\rtti\DocFiscaisAttributes.pas',
   Query in '..\domain\query\Query.pas',
-  LerClassesRTTI in '..\domain\rtti\LerClassesRTTI.pas';
+  LerClassesRTTI in '..\domain\rtti\LerClassesRTTI.pas',
+  GenericEntity in '..\src\modules\generics\entity\GenericEntity.pas',
+  EmpresaEntity in '..\src\modules\empresa\entity\EmpresaEntity.pas',
+  ParceiroEntity in '..\src\modules\parceiro\entity\ParceiroEntity.pas',
+  Enums in '..\src\shared\types\Enums.pas';
 
 begin
   try

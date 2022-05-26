@@ -2,7 +2,7 @@ unit ConfiguracaoBD;
 
 interface
 
-uses Conexao, Logger, Query, LerClassesRTTI;
+uses Conexao, Logger, Query, LerClassesRTTI, System.Classes, EmpresaEntity, ParceiroEntity;
 
 type
   TConfiguracaoBD = class
@@ -13,12 +13,15 @@ type
     { protected declarations }
     function VerificarTabela(const poClass: TClass): boolean;
     function GerarScriptCreate(const poClasse: TLerClassesRTTI): string;
+    function GerarScriptCreatePK(const poClasse: TLerClassesRTTI): string;
+    function GerarScriptCreateFK(const poProperty: TLerClassesProperty): string;
+    function GerarScriptCreateField(const poProperty: TLerClassesProperty): string;
   public
     { public declarations }
     constructor Create;
     destructor Destroy; override;
 
-    function VerificarBancoDados: boolean;
+    function ConfigurarBancoDados: boolean;
   end;
 
 implementation
@@ -37,56 +40,96 @@ end;
 
 destructor TConfiguracaoBD.Destroy;
 begin
-  TLogger.InserirLog(Self.ClassName, 'Limpando instancia');
   FoConexao.Free;
-  inherited;
+  TLogger.InserirLog(Self.ClassName, 'Limpando instancia');
 end;
 
 function TConfiguracaoBD.GerarScriptCreate(const poClasse: TLerClassesRTTI): string;
 var
   sQuery: string;
   sPK: string;
+  sFK: string;
   sFields: string;
   I: Integer;
 begin
-  sPK := '';
-  sFields := '';
-
   for I := 0 to Pred(poClasse.Propriedades.Count) do
   begin
-    if poClasse.Propriedades[I].PK then
-    begin
-      if sPK = '' then
-        sPk := poClasse.Propriedades[I].CampoBD
-      else
-        sPk := sPK + ', ' + poClasse.Propriedades[I].CampoBD;
-    end;
+    if sFields <> '' then
+      sFields := sFields + ', ';
+    sFields := sFields +  GerarScriptCreateField(poClasse.Propriedades.Items[I]);
 
-    if poClasse.Propriedades[I].AutoInc then
-    begin
-      sFields := sFields + poClasse.Propriedades[I].CampoBD + ' SERIAL NOT NULL, ';
-      Continue;
-    end;
-
-    sFields := sFields + Format(' %s %s %s,', [poClasse.Propriedades[I].CampoBD,
-                                               poClasse.Propriedades[I].Kind,
-                                               ifthen(poClasse.Propriedades[I].NotNull, 'NOT NULL', '')]);
+    if poClasse.Propriedades.Items[I].FK then
+      sFK := sFk + ', ' + GerarScriptCreateFK(poClasse.Propriedades.Items[I]);
   end;
 
+  sPK := GerarScriptCreatePK(poClasse);
 
-  sQuery := Format('CREATE TABLE IF NOT EXISTS %s (%s %s)',
+  sQuery := Format('CREATE TABLE %s (%s %s %s)',
                   [poClasse.Schema + '.' + poClasse.Tabela,
                    sFields,
-                   Format('CONSTRAINT %SPK PRIMARY KEY (%s)', [poClasse.Tabela, sPK])]);
+                   ifthen(sPK = '', '', ', ' + sPK),
+                   ifthen(sFK = '', '', ifthen(sPK <> '', sFK, ', ' + sFK))]);
   Result := sQuery;
 end;
 
-function TConfiguracaoBD.VerificarBancoDados: boolean;
+function TConfiguracaoBD.GerarScriptCreateField(const poProperty: TLerClassesProperty): string;
+var
+  sFields: string;
+begin
+  if poProperty.AutoInc then
+  begin
+    sFields := sFields + poProperty.CampoBD + ' SERIAL NOT NULL';
+    Exit(sFields);
+  end;
+
+  Result := Format(' %s %s %s', [poProperty.CampoBD,
+                                  poProperty.Kind,
+                                  ifthen(poProperty.NotNull, 'NOT NULL', '')]);
+end;
+
+function TConfiguracaoBD.GerarScriptCreateFK(const poProperty: TLerClassesProperty): string;
+var
+  sPK: string;
+  oLerClasses: TLerClassesRTTI;
+begin
+  try
+    oLerClasses := TLerClassesRTTI.Create(poProperty.ClasseFK);
+
+    sPK := oLerClasses.CamposPK;
+
+
+    Result := Format(' CONSTRAINT %sFK%s FOREIGN KEY(%s) REFERENCES %s(%s)', [
+                     poProperty.Owner.Tabela,
+                     oLerClasses.Tabela,
+                     poProperty.CampoBD,
+                     oLerClasses.Schema + '.' + oLerClasses.Tabela,
+                     sPK]);
+  finally
+    FreeAndNil(oLerClasses);
+  end;
+end;
+
+function TConfiguracaoBD.GerarScriptCreatePK(const poClasse: TLerClassesRTTI): string;
+var
+  sPK: string;
+begin
+  sPK := poClasse.CamposPK;
+
+  if sPK = '' then
+    Exit('');
+
+  Result := Format('CONSTRAINT %SPK PRIMARY KEY (%s)', [poClasse.Tabela, sPK]);
+end;
+
+function TConfiguracaoBD.ConfigurarBancoDados: boolean;
 begin
   Result := True;
   TLogger.InserirLog(Self.ClassName + '(VerificarBancoDados)', 'Iniciando');
-  VerificarTabela(TDocFiscaisConfEntity);
 
+
+  VerificarTabela(TDocFiscaisConfEntity);
+  VerificarTabela(TEmpresaEntity);
+  VerificarTabela(TParceiroEntity);
 end;
 
 function TConfiguracaoBD.VerificarTabela(const poClass: TClass): boolean;
@@ -100,7 +143,6 @@ begin
     Result := false;
 
     oLerClasse := TLerClassesRTTI.Create(poClass);
-    TLogger.InserirLog(Self.ClassName, 'Verificando tabela ' + oLerClasse.Tabela);
 
     oQuery := TQuery.Create;
 
@@ -121,10 +163,24 @@ begin
 
     oQueryCreate := GerarScriptCreate(oLerClasse);
 
-    oDataSet.SQL.Clear;
-    oDataSet.SQL.Add(oQueryCreate);
-    oDataSet.ExecSQL;
+    oDataSet.Connection.StartTransaction;
+
+    try
+      oDataSet.SQL.Clear;
+      oDataSet.SQL.Add(oQueryCreate);
+      oDataSet.ExecSQL;
+
+      oDataSet.Connection.Commit;
+    except
+      on E: Exception do
+      begin
+        TLogger.InserirLog(Self.ClassName, 'Criando tabela ' + oLerClasse.Tabela + ' ' + e.Message);
+        oDataSet.Connection.Rollback;
+      end;
+    end;
   finally
+    oDataSet.Connection.Close;
+
     FreeAndNil(oLerClasse);
     FreeAndNil(oQuery);
     FreeAndNil(oDataSet);

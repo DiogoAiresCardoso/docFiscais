@@ -39,6 +39,19 @@ type
     property TypeKind: TFieldType read FKind;
   end;
 
+  TFK = class(TCustomAttribute)
+  private
+    FClasseFK: TClass;
+    { private declarations }
+  protected
+    { protected declarations }
+  public
+    { public declarations }
+    constructor Create(poClasseFK: TClass);
+
+    property ClasseFK: TClass read FClasseFK;
+  end;
+
 implementation
 
 uses
@@ -69,6 +82,13 @@ begin
     ftBlob: result := 'oid';
     ftTimeStamp: result := 'time with time zone';
   end;
+end;
+
+{ TFK }
+
+constructor TFK.Create(poClasseFK: TClass);
+begin
+  FClasseFK := poClasseFK;
 end;
 
 end.
