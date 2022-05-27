@@ -12,13 +12,16 @@ uses
   Logger in '..\src\shared\logger\Logger.pas',
   ConfiguracaoBD in '..\src\infra\bd\ConfiguracaoBD.pas',
   DocFiscaisConfEntity in '..\src\modules\docFiscaisConf\entity\DocFiscaisConfEntity.pas',
-  DocFiscaisAttributes in '..\domain\rtti\DocFiscaisAttributes.pas',
-  Query in '..\domain\query\Query.pas',
-  LerClassesRTTI in '..\domain\rtti\LerClassesRTTI.pas',
   GenericEntity in '..\src\modules\generics\entity\GenericEntity.pas',
   EmpresaEntity in '..\src\modules\empresa\entity\EmpresaEntity.pas',
   ParceiroEntity in '..\src\modules\parceiro\entity\ParceiroEntity.pas',
-  Enums in '..\src\shared\types\Enums.pas';
+  Enums in '..\src\shared\types\Enums.pas',
+  DocFiscaisAttributes in '..\src\domain\rtti\DocFiscaisAttributes.pas',
+  LerClassesRTTI in '..\src\domain\rtti\LerClassesRTTI.pas',
+  Query in '..\src\domain\query\Query.pas',
+  DAO in '..\src\infra\bd\DAO.pas',
+  IDAO in '..\src\domain\interfaces\IDAO.pas',
+  EntityUtils in '..\src\shared\utils\EntityUtils.pas';
 
 begin
   try

@@ -88,13 +88,16 @@
         <DCCReference Include="..\src\shared\logger\Logger.pas"/>
         <DCCReference Include="..\src\infra\bd\ConfiguracaoBD.pas"/>
         <DCCReference Include="..\src\modules\docFiscaisConf\entity\DocFiscaisConfEntity.pas"/>
-        <DCCReference Include="..\domain\rtti\DocFiscaisAttributes.pas"/>
-        <DCCReference Include="..\domain\query\Query.pas"/>
-        <DCCReference Include="..\domain\rtti\LerClassesRTTI.pas"/>
         <DCCReference Include="..\src\modules\generics\entity\GenericEntity.pas"/>
         <DCCReference Include="..\src\modules\empresa\entity\EmpresaEntity.pas"/>
         <DCCReference Include="..\src\modules\parceiro\entity\ParceiroEntity.pas"/>
         <DCCReference Include="..\src\shared\types\Enums.pas"/>
+        <DCCReference Include="..\src\domain\rtti\DocFiscaisAttributes.pas"/>
+        <DCCReference Include="..\src\domain\rtti\LerClassesRTTI.pas"/>
+        <DCCReference Include="..\src\domain\query\Query.pas"/>
+        <DCCReference Include="..\src\infra\bd\DAO.pas"/>
+        <DCCReference Include="..\src\domain\interfaces\IDAO.pas"/>
+        <DCCReference Include="..\src\shared\utils\EntityUtils.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
@@ -566,6 +569,7 @@
             <Platforms>
                 <Platform value="Win32">True</Platform>
             </Platforms>
+            <ModelSupport>False</ModelSupport>
         </BorlandProject>
         <ProjectFileVersion>12</ProjectFileVersion>
     </ProjectExtensions>
