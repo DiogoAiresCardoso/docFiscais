@@ -21,7 +21,8 @@ uses
   Query in '..\src\domain\query\Query.pas',
   DAO in '..\src\infra\bd\DAO.pas',
   IDAO in '..\src\domain\interfaces\IDAO.pas',
-  EntityUtils in '..\src\shared\utils\EntityUtils.pas';
+  EntityUtils in '..\src\shared\utils\EntityUtils.pas',
+  InstructionSQLEntity in '..\src\domain\rtti\InstructionSQLEntity.pas';
 
 begin
   try
