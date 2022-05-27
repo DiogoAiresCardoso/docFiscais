@@ -6,31 +6,28 @@ uses
   LerClassesRTTI;
 
 type
-  TInstructionSQLEntity<T: constructor> = class
+  TInstructionSQLEntity = class
   private
     FoProperties: TLerClassesRTTI;
     FSQLCreateTable: string;
-    FsCampos: string;
-    FsValues: string;
-    FsWhere: string;
-    function GetFSQLCreateTable: string;
-    procedure MontarCampos(const pbAdicionarPK: boolean = false);
-    procedure MontarValues(const pbConcatenarCampo: boolean = true; const pbAdicionarPK: boolean = false);
-    function MontarCampoCreate(const poPropriedade: TLerClassesProperty): string;
+    FsTabela: string;
     { private declarations }
   protected
     { protected declarations }
-    const
-      sCREATETABLE = 'CREATE TABLE %s (%s %s %s)';
-      sINSERT = 'INSERT INTO %s (%s) VALUES(%s);';
-      sUPDATE = 'UPDATE %s SET %s where %s';
-      sDELETE = 'DELETE FROM %s where %s';
+    // Destined block for CreateTable
+    function GetFSQLCreateTable: string;
+    function MakeFields: string;
+    function MakePK: string;
+    function MakeFK: string;
+    // Destined block for Insert
+
   public
     { public declarations }
-    constructor Create;
+    constructor Create(const poClass: TClass);
     destructor Destroy; override;
 
     property SQLCreateTable: string read GetFSQLCreateTable;
+    property Properties: TLerClassesRTTI read FoProperties;
   end;
 
 implementation
@@ -38,69 +35,114 @@ implementation
 uses
   TypInfo, StrUtils, SysUtils;
 
+const
+  sCREATETABLE = 'CREATE TABLE %s (%s %s %s)';
+  sCREATEFK =  ', CONSTRAINT %sFK%s FOREIGN KEY(%s) REFERENCES %s(%s)';
+  sCREATEPK = ', CONSTRAINT %SPK PRIMARY KEY (%s)';
+  sINSERT = 'INSERT INTO %s (%s) VALUES(%s);';
+  sUPDATE = 'UPDATE %s SET %s where %s';
+  sDELETE = 'DELETE FROM %s where %s';
+
 { TInstructionSQLEntity<T> }
 
-constructor TInstructionSQLEntity<T>.Create;
-var
-  Info: PTypeInfo;
+constructor TInstructionSQLEntity.Create(const poClass: TClass);
 begin
-  Info := System.TypeInfo(T);
-  FoProperties := TLerClassesRTTI.Create(Info);
+  FoProperties := TLerClassesRTTI.Create(poClass);
+
+  FsTabela := ifthen(FoProperties.Schema <> '', FoProperties.Schema + '.', '') + FoProperties.Tabela;
 end;
 
-destructor TInstructionSQLEntity<T>.Destroy;
+destructor TInstructionSQLEntity.Destroy;
 begin
   FoProperties.Free;
 end;
 
-function TInstructionSQLEntity<T>.GetFSQLCreateTable: string;
+function TInstructionSQLEntity.GetFSQLCreateTable: string;
+var
+  sFields: string;
+  SPK: string;
+  sFK: string;
 begin
   if FSQLCreateTable <> '' then
-    Exit(FSQLCreateTable);  
+    Exit(FSQLCreateTable);
+
+  sFields := MakeFields;
+  sPK := MakePK;
+  sFK := MakeFK;
+
+  FSQLCreateTable := Format(sCREATETABLE, [FsTabela, sFields, sPK, sFK]);
 
   Result := FSQLCreateTable;
 end;
 
-function TInstructionSQLEntity<T>.MontarCampoCreate(const poPropriedade: TLerClassesProperty): string;
+function TInstructionSQLEntity.MakeFields: string;
+var
+  sFields: string;
+  I: integer;
+  oProperty: TLerClassesProperty;
 begin
+  for I := 0 to Pred(FoProperties.Propriedades.Count) do
+  begin
+    oProperty := FoProperties.Propriedades.Items[I];
 
-  
+    if sFields <> '' then
+      sFields := sFields + ', ';
 
-  Result := Format(' %s %s %s', [poPropriedade.CampoBD]);
+    if oProperty.AutoInc then
+    begin
+      sFields := sFields + oProperty.CampoBD + ' SERIAL NOT NULL';
+      Continue;
+    end;
+
+    sFields := sFields + Format(' %s %s', [oProperty.CampoBD, oProperty.Kind]);
+
+    if oProperty.NotNull then
+     sFields := sFields + ' NOT NULL';
+  end;
+
+  Result := sFields;
 end;
 
-procedure TInstructionSQLEntity<T>.MontarCampos(const pbAdicionarPK: boolean);
+function TInstructionSQLEntity.MakeFK: string;
 var
+  sPK: string;
+  oPropertyOwner: TLerClassesProperty;
+  oPropertiesFK: TLerClassesRTTI;
   I: Integer;
 begin
   for I := 0 to Pred(FoProperties.Propriedades.Count) do
   begin
-    if (FoProperties.Propriedades.Items[I].PK) and
-       (not pbAdicionarPK) then
+    oPropertyOwner := FoProperties.Propriedades.Items[I];
+
+    if not oPropertyOwner.FK then
       Continue;
 
-    FsCampos := Format('%s %s',
-                      [ifthen(FsValues <> '', FsValues + ', ', FsValues),
-                       FoProperties.Propriedades.Items[I].CampoBD]);
+    oPropertiesFK := TLerClassesRTTI.Create(FoProperties.Propriedades.Items[I].ClasseFK);
+
+    try
+      sPK := oPropertiesFK.CamposPK;
+
+      Result := Result + Format(sCREATEFK, [FoProperties.Tabela,
+                                            oPropertiesFK.Tabela,
+                                            oPropertyOwner.CampoBD + ifthen(oPropertyOwner.FKChaves <> '', ',' + oPropertyOwner.FKChaves, ''),
+                                            ifthen(oPropertiesFK.Schema <> '', oPropertiesFK.Schema + '.', '') + oPropertiesFK.Tabela,
+                                            sPK]);
+    finally
+      oPropertiesFK.Free;
+    end;
   end;
 end;
 
-procedure TInstructionSQLEntity<T>.MontarValues(const pbConcatenarCampo: boolean; const pbAdicionarPK: boolean);
+function TInstructionSQLEntity.MakePK: string;
 var
-  I: Integer;
+  sPK: string;
 begin
-  for I := 0 to Pred(FoProperties.Propriedades.Count) do
-  begin
-    if (FoProperties.Propriedades.Items[I].PK) and
-       (not pbAdicionarPK) then
-      Continue;
+  sPK := FoProperties.CamposPK;
 
-    FsValues := Format('%s %s', 
-                      [ifthen(FsValues <> '', FsValues + ', ', FsValues), 
-                       ifthen(pbConcatenarCampo, 
-                              Format('%s = :%s', [FoProperties.Propriedades.Items[I].CampoBD]),
-                              Format(':%s', [FoProperties.Propriedades.Items[I].CampoBD]))]);
-  end;
+  if sPK = '' then
+    Exit('');
+
+  Result := Format(sCREATEPK, [FoProperties.Tabela, sPK]);
 end;
 
 end.

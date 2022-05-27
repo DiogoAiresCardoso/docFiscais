@@ -21,6 +21,7 @@ type
     FClasseFK: TClass;
     FFK: boolean;
     FoOwner: TLerClassesRTTI;
+    FFKChaves: string;
     { private declarations }
   protected
     { protected declarations }
@@ -37,6 +38,7 @@ type
     property NotNull: boolean read FNotNull write FNotNull default false;
     property AutoInc: boolean read FAutoInc write FAutoInc default false;
     property FK: boolean read FFK write FFK default false;
+    property FKChaves: string read FFKChaves write FFKChaves;
     property ClasseFK: TClass read FClasseFK write FClasseFK;
 
     property Owner: TLerClassesRTTI read FoOwner;
@@ -170,6 +172,7 @@ begin
       begin
         oPropriedade.FK := True;
         oPropriedade.ClasseFK := TFK(oAtributo).ClasseFK;
+        oPropriedade.FKChaves := TFK(oAtributo).ChaveMultipla;
       end;
     end;
 
@@ -183,5 +186,6 @@ constructor TLerClassesProperty.Create(oOwner: TLerClassesRTTI);
 begin
   FoOwner := oOwner;
 end;
+
 
 end.

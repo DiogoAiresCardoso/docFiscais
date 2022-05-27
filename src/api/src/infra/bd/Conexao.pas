@@ -49,6 +49,7 @@ begin
   oParams.Password := 'postgres';
   oParams.Server := '127.0.0.1';
   oParams.MetaDefSchema := 'doc';
+  oParams.MetaCurSchema := 'doc';
 
   TLogger.InserirLog(Self.ClassName, 'Servidor: ' + oParams.Server, False);
   TLogger.InserirLog(Self.ClassName, 'Schema: ' + oParams.MetaDefSchema, False);

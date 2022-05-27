@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <BorlandProject>
 	<Transactions>
-    <Transaction>2022/05/25 11:57:39.000.645,M:\DocumentosFiscais\pkg\DocumentosFiscais.groupproj=C:\Users\devdi\Documents\Embarcadero\Studio\Projects\ProjectGroup1.groupproj</Transaction>
+    <Transaction>2022/05/25 11:57:39.000.645,C:\Users\devdi\Documents\Embarcadero\Studio\Projects\ProjectGroup1.groupproj=M:\DocumentosFiscais\pkg\DocumentosFiscais.groupproj</Transaction>
   </Transactions>
 	<Default.Personality>
-		<Projects ActiveProject="C:\Users\diogo.cardoso\Documents\docFiscais\src\api\pkg\DocFiscaisApi.dproj"/>
+		<Projects ActiveProject="M:\DocumentosFiscais\src\api\pkg\DocFiscaisApi.dproj"/>
 	</Default.Personality>
 </BorlandProject>

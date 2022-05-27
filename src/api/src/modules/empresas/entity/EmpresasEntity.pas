@@ -1,12 +1,12 @@
-unit EmpresaEntity;
+unit EmpresasEntity;
 
 interface
 
 uses DocFiscaisAttributes, DB, SimpleAttributes, GenericEntity, Enums;
 
 type
-  [TTable('empresa')]
-  TEmpresaEntity = class(TGenericEntity)
+  [TTable('empresas')]
+  TEmpresasEntity = class(TGenericEntity)
   private
     FFantasia: string;
     FCNPJ: string;

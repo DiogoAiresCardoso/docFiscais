@@ -1,12 +1,12 @@
-unit ParceiroEntity;
+unit ParceirosEntity;
 
 interface
 
-uses DocFiscaisAttributes, DB, SimpleAttributes, GenericEntity, Enums, EmpresaEntity;
+uses DocFiscaisAttributes, DB, SimpleAttributes, GenericEntity, Enums, EmpresasEntity;
 
 type
-  [TTable('parceiro')]
-  TParceiroEntity = class(TGenericEntity)
+  [TTable('parceiros')]
+  TParceirosEntity = class(TGenericEntity)
   private
     FCNPJ: string;
     FDataNascimento: TDateTime;
@@ -14,7 +14,7 @@ type
     FId: integer;
     FNome: string;
     FTipo: TTipoPessoa;
-    FEmpresa: TEmpresaEntity;
+    FEmpresa: TEmpresasEntity;
     { private declarations }
   protected
     { protected declarations }
@@ -23,8 +23,8 @@ type
     { protected declarations }
     [TCampoBD('id', TFieldType.ftInteger), PK, NotNull, AutoInc]
     property Id: integer read FId write FId;
-    [TCampoBD('empresa', TFieldType.ftInteger), TFK(TEmpresaEntity), NotNull]
-    property Empresa: TEmpresaEntity read FEmpresa write FEmpresa;
+    [TCampoBD('empresa', TFieldType.ftInteger), PK, TFK(TEmpresasEntity), NotNull]
+    property Empresa: TEmpresasEntity read FEmpresa write FEmpresa;
     [TCampoBD('tipo', TFieldType.ftInteger), NotNull]
     property Tipo: TTipoPessoa read FTipo write FTipo;
     [TCampoBD('cpf', TFieldType.ftString, 11)]

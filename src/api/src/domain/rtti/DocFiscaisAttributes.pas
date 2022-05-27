@@ -42,14 +42,16 @@ type
   TFK = class(TCustomAttribute)
   private
     FClasseFK: TClass;
+    FsChaveMultipla: string;
     { private declarations }
   protected
     { protected declarations }
   public
     { public declarations }
-    constructor Create(poClasseFK: TClass);
+    constructor Create(poClasseFK: TClass; poChaveMultipla: string = '');
 
     property ClasseFK: TClass read FClasseFK;
+    property ChaveMultipla: string read FsChaveMultipla;
   end;
 
 implementation
@@ -86,9 +88,10 @@ end;
 
 { TFK }
 
-constructor TFK.Create(poClasseFK: TClass);
+constructor TFK.Create(poClasseFK: TClass; poChaveMultipla: string);
 begin
   FClasseFK := poClasseFK;
+  FsChaveMultipla := poChaveMultipla;
 end;
 
 end.

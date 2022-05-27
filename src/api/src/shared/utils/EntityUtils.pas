@@ -137,6 +137,7 @@ end;
 function TEntityUtils<T>.GetSQLUpdate: string;
 var
   sCampos: string;
+  I: Integer;
 begin
   if FsSQLUpdate <> '' then
     Exit(FsSQLUpdate);
