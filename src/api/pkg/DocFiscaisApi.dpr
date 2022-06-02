@@ -14,7 +14,7 @@ uses
   GenericEntity in '..\src\modules\generics\entity\GenericEntity.pas',
   Enums in '..\src\shared\types\Enums.pas',
   DocFiscaisAttributes in '..\src\domain\rtti\DocFiscaisAttributes.pas',
-  LerClassesRTTI in '..\src\domain\rtti\LerClassesRTTI.pas',
+  ClassRTTI in '..\src\domain\rtti\ClassRTTI.pas',
   Query in '..\src\domain\query\Query.pas',
   DAO in '..\src\infra\bd\DAO.pas',
   IDAO in '..\src\domain\interfaces\IDAO.pas',
@@ -25,7 +25,9 @@ uses
   EmpresasEntity in '..\src\modules\empresas\entity\EmpresasEntity.pas',
   ParceirosEntity in '..\src\modules\parceiros\entity\ParceirosEntity.pas',
   AdapterTables in '..\src\infra\bd\adapter\AdapterTables.pas',
-  AdapterAbstract in '..\src\infra\bd\adapter\AdapterAbstract.pas';
+  AdapterAbstract in '..\src\infra\bd\adapter\AdapterAbstract.pas',
+  AbstractClass in '..\src\domain\abstract\AbstractClass.pas',
+  EnderecoEntity in '..\src\modules\endereco\entity\EnderecoEntity.pas';
 
 begin
   try

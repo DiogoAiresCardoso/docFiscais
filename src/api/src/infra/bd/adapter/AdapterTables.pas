@@ -5,7 +5,7 @@ interface
 uses FireDAC.Comp.Client, AdapterAbstract;
 
 type
-  TAdapterTables = class(TAdapterAbstract)
+  TAdapterTables = class sealed(TAdapterAbstract)
   private
     { private declarations }
   protected
@@ -13,6 +13,7 @@ type
   public
     { public declarations }
     function CreateTable(const poClass: TClass): boolean;
+    function CreateColumn(const poClass: TClass): boolean;
   end;
 
 implementation
@@ -20,6 +21,53 @@ implementation
 { TAdapterTables }
 
 uses InstructionSQLEntity, System.SysUtils, FireDAC.Phys.Intf, Data.DB, Logger;
+
+function TAdapterTables.CreateColumn(const poClass: TClass): boolean;
+var
+  oInstruction: TInstructionSQLEntity;
+  I: integer;
+  sScriptCreateColumn: string;
+begin
+  oInstruction := TInstructionSQLEntity.Create(poClass);
+  Result := True;
+  try
+    FoMetaInfo.Active := False;
+    FoMetaInfo.MetaInfoKind := TFDPhysMetaInfoKind.mkTableFields;
+    FoMetaInfo.SchemaName := oInstruction.Properties.Schema;
+    FoMetaInfo.ObjectName := oInstruction.Properties.Table;
+    FoMetaInfo.Active := True;
+
+    for I := 0 to Pred(oInstruction.Properties.Fields.Count) do
+    begin
+      if not Result then
+        Break;
+
+      FoMetaInfo.Filtered := False;
+      FoMetaInfo.Filter := 'COLUMN_NAME = ' + QuotedStr(oInstruction.Properties.Fields.Items[I].FieldNameBD);
+      FoMetaInfo.Filtered := True;
+
+      if not FoMetaInfo.IsEmpty then
+        Continue;
+
+      try
+        sScriptCreateColumn := oInstruction.SQLCreateColumn(I);
+        FoQuery.SQL.Clear;
+        FoQuery.SQL.Add(sScriptCreateColumn);
+        FoQuery.ExecSQL;
+
+        TLogger.InserirLog(oInstruction.Properties.Fields.Items[I].FieldNameBD + ' coluna criada');
+      except
+        on E : Exception do
+        begin
+          TLogger.InserirLog(oInstruction.Properties.Fields.Items[I].FieldNameBD + ' falha ao criar coluna ' + E.Message);
+          Result := False;
+        end;
+      end;
+    end;
+  finally
+    FreeAndNil(oInstruction);
+  end;
+end;
 
 function TAdapterTables.CreateTable(const poClass: TClass): boolean;
 var
@@ -34,12 +82,12 @@ begin
       FoMetaInfo.Active := True;
 
       FoMetaInfo.Filtered := False;
-      FoMetaInfo.Filter := 'TABLE_NAME = ' + QuotedStr(oInstruction.Properties.Tabela);
+      FoMetaInfo.Filter := 'TABLE_NAME = ' + QuotedStr(oInstruction.Properties.Table);
       FoMetaInfo.Filtered := True;
 
       if not FoMetaInfo.IsEmpty then
       begin
-        TLogger.InserirLog(Self.ClassName + ' - ' + oInstruction.Properties.Tabela, 'Tabela ok');
+        TLogger.InserirLog(oInstruction.Properties.Table + ' ok');
         Exit(True);
       end;
 
@@ -49,18 +97,18 @@ begin
       FoQuery.SQL.Add(sScriptCreate);
       FoQuery.ExecSQL;
 
-      TLogger.InserirLog(Self.ClassName + ' - ' + oInstruction.Properties.Tabela, 'Tabela criada');
+      TLogger.InserirLog(oInstruction.Properties.Table + ' criada');
 
       Result := true;
     except
       on E: Exception do
       begin
-        TLogger.InserirLog(Self.ClassName + ' - ' + oInstruction.Properties.Tabela, 'Falha ao criar tabela ' + E.Message);
+        TLogger.InserirLog(oInstruction.Properties.Table + ' falha ao criar tabela ' + E.Message);
         Result := False;
       end;
     end;
   finally
-    oInstruction.Free;
+    FreeAndNil(oInstruction);
   end;
 end;
 

@@ -2,11 +2,11 @@ unit EmpresasEntity;
 
 interface
 
-uses DocFiscaisAttributes, DB, SimpleAttributes, GenericEntity, Enums;
+uses DocFiscaisAttributes, DB, SimpleAttributes, Enums, EnderecoEntity;
 
 type
   [TTable('empresas')]
-  TEmpresasEntity = class(TGenericEntity)
+  TEmpresasEntity = class(TEnderecoEntity)
   private
     FFantasia: string;
     FCNPJ: string;
@@ -29,7 +29,6 @@ type
     property RazaoSocial: string read FRazaoSocial write FRazaoSocial;
     [TCampoBD('fantasia', TFieldType.ftString, 100)]
     property Fantasia: string read FFantasia write FFantasia;
-
   end;
 
 implementation

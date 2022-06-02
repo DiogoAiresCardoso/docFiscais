@@ -3,12 +3,12 @@ unit InstructionSQLEntity;
 interface
 
 uses
-  LerClassesRTTI;
+  ClassRTTI;
 
 type
   TInstructionSQLEntity = class
   private
-    FoProperties: TLerClassesRTTI;
+    FoProperties: TClassRTTI;
     FSQLCreateTable: string;
     FsTabela: string;
     { private declarations }
@@ -26,8 +26,10 @@ type
     constructor Create(const poClass: TClass);
     destructor Destroy; override;
 
+    function SQLCreateColumn(const pnIndex: integer): string;
+
     property SQLCreateTable: string read GetFSQLCreateTable;
-    property Properties: TLerClassesRTTI read FoProperties;
+    property Properties: TClassRTTI read FoProperties;
   end;
 
 implementation
@@ -42,14 +44,15 @@ const
   sINSERT = 'INSERT INTO %s (%s) VALUES(%s);';
   sUPDATE = 'UPDATE %s SET %s where %s';
   sDELETE = 'DELETE FROM %s where %s';
+  sCREATECOLUMN = 'ALTER TABLE %s ADD COLUMN IF NOT EXISTS %s %s;';
 
 { TInstructionSQLEntity<T> }
 
 constructor TInstructionSQLEntity.Create(const poClass: TClass);
 begin
-  FoProperties := TLerClassesRTTI.Create(poClass);
+  FoProperties := TClassRTTI.Create(poClass);
 
-  FsTabela := ifthen(FoProperties.Schema <> '', FoProperties.Schema + '.', '') + FoProperties.Tabela;
+  FsTabela := ifthen(FoProperties.Schema <> '', FoProperties.Schema + '.', '') + FoProperties.Table;
 end;
 
 destructor TInstructionSQLEntity.Destroy;
@@ -79,22 +82,22 @@ function TInstructionSQLEntity.MakeFields: string;
 var
   sFields: string;
   I: integer;
-  oProperty: TLerClassesProperty;
+  oProperty: TClassPropertyRTTI;
 begin
-  for I := 0 to Pred(FoProperties.Propriedades.Count) do
+  for I := 0 to Pred(FoProperties.Fields.Count) do
   begin
-    oProperty := FoProperties.Propriedades.Items[I];
+    oProperty := FoProperties.Fields.Items[I];
 
     if sFields <> '' then
       sFields := sFields + ', ';
 
     if oProperty.AutoInc then
     begin
-      sFields := sFields + oProperty.CampoBD + ' SERIAL NOT NULL';
+      sFields := sFields + oProperty.FieldNameBD + ' SERIAL NOT NULL';
       Continue;
     end;
 
-    sFields := sFields + Format(' %s %s', [oProperty.CampoBD, oProperty.Kind]);
+    sFields := sFields + Format(' %s %s', [oProperty.FieldNameBD, oProperty.Kind]);
 
     if oProperty.NotNull then
      sFields := sFields + ' NOT NULL';
@@ -106,26 +109,26 @@ end;
 function TInstructionSQLEntity.MakeFK: string;
 var
   sPK: string;
-  oPropertyOwner: TLerClassesProperty;
-  oPropertiesFK: TLerClassesRTTI;
+  oPropertyOwner: TClassPropertyRTTI;
+  oPropertiesFK: TClassRTTI;
   I: Integer;
 begin
-  for I := 0 to Pred(FoProperties.Propriedades.Count) do
+  for I := 0 to Pred(FoProperties.Fields.Count) do
   begin
-    oPropertyOwner := FoProperties.Propriedades.Items[I];
+    oPropertyOwner := FoProperties.Fields.Items[I];
 
     if not oPropertyOwner.FK then
       Continue;
 
-    oPropertiesFK := TLerClassesRTTI.Create(FoProperties.Propriedades.Items[I].ClasseFK);
+    oPropertiesFK := TClassRTTI.Create(FoProperties.Fields.Items[I].ClassFK);
 
     try
-      sPK := oPropertiesFK.CamposPK;
+      sPK := oPropertiesFK.FieldsPK;
 
-      Result := Result + Format(sCREATEFK, [FoProperties.Tabela,
-                                            oPropertiesFK.Tabela,
-                                            oPropertyOwner.CampoBD + ifthen(oPropertyOwner.FKChaves <> '', ',' + oPropertyOwner.FKChaves, ''),
-                                            ifthen(oPropertiesFK.Schema <> '', oPropertiesFK.Schema + '.', '') + oPropertiesFK.Tabela,
+      Result := Result + Format(sCREATEFK, [FoProperties.Table,
+                                            oPropertiesFK.Table,
+                                            oPropertyOwner.FieldNameBD + ifthen(oPropertyOwner.FieldsFK <> '', ',' + oPropertyOwner.FieldsFK, ''),
+                                            ifthen(oPropertiesFK.Schema <> '', oPropertiesFK.Schema + '.', '') + oPropertiesFK.Table,
                                             sPK]);
     finally
       oPropertiesFK.Free;
@@ -137,12 +140,19 @@ function TInstructionSQLEntity.MakePK: string;
 var
   sPK: string;
 begin
-  sPK := FoProperties.CamposPK;
+  sPK := FoProperties.FieldsPK;
 
   if sPK = '' then
     Exit('');
 
-  Result := Format(sCREATEPK, [FoProperties.Tabela, sPK]);
+  Result := Format(sCREATEPK, [FoProperties.Table, sPK]);
+end;
+
+function TInstructionSQLEntity.SQLCreateColumn(const pnIndex: integer): string;
+begin
+  Result := Format(sCREATECOLUMN, [FsTabela,
+                                   FoProperties.Fields.Items[pnIndex].FieldNameBD,
+                                   FoProperties.Fields.Items[pnIndex].Kind]);
 end;
 
 end.

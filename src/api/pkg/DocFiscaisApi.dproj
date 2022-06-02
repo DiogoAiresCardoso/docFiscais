@@ -90,7 +90,7 @@
         <DCCReference Include="..\src\modules\generics\entity\GenericEntity.pas"/>
         <DCCReference Include="..\src\shared\types\Enums.pas"/>
         <DCCReference Include="..\src\domain\rtti\DocFiscaisAttributes.pas"/>
-        <DCCReference Include="..\src\domain\rtti\LerClassesRTTI.pas"/>
+        <DCCReference Include="..\src\domain\rtti\ClassRTTI.pas"/>
         <DCCReference Include="..\src\domain\query\Query.pas"/>
         <DCCReference Include="..\src\infra\bd\DAO.pas"/>
         <DCCReference Include="..\src\domain\interfaces\IDAO.pas"/>
@@ -102,6 +102,8 @@
         <DCCReference Include="..\src\modules\parceiros\entity\ParceirosEntity.pas"/>
         <DCCReference Include="..\src\infra\bd\adapter\AdapterTables.pas"/>
         <DCCReference Include="..\src\infra\bd\adapter\AdapterAbstract.pas"/>
+        <DCCReference Include="..\src\domain\abstract\AbstractClass.pas"/>
+        <DCCReference Include="..\src\modules\endereco\entity\EnderecoEntity.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

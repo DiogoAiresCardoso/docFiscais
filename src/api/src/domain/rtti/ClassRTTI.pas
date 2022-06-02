@@ -1,4 +1,4 @@
-unit LerClassesRTTI;
+unit ClassRTTI;
 
 interface
 
@@ -6,66 +6,66 @@ uses
   Generics.Collections, DB, DocFiscaisAttributes, SimpleAttributes, RTTI;
 
 type
-  TLerClassesRTTI = class;
+  TClassRTTI = class;
 
-  TLerClassesProperty = class
+  TClassPropertyRTTI = class
   private
     FTypeKind: TFieldType;
     FKind: string;
-    FNome: string;
-    FTamanho: integer;
-    FCampoBD: string;
+    FFieldName: string;
+    FSize: integer;
+    FFieldNameBD: string;
     FPK: boolean;
     FNotNull: boolean;
     FAutoInc: boolean;
-    FClasseFK: TClass;
+    FClassFK: TClass;
     FFK: boolean;
-    FoOwner: TLerClassesRTTI;
-    FFKChaves: string;
+    FoOwner: TClassRTTI;
+    FFieldsFK: string;
     { private declarations }
   protected
     { protected declarations }
   public
     { public declarations }
-    constructor Create(oOwner: TLerClassesRTTI);
+    constructor Create(oOwner: TClassRTTI);
 
-    property Nome: string read FNome write FNome;
-    property CampoBD: string read FCampoBD write FCampoBD;
-    property Tamanho: integer read FTamanho write FTamanho;
+    property FieldName: string read FFieldName write FFieldName;
+    property FieldNameBD: string read FFieldNameBD write FFieldNameBD;
+    property Size: integer read FSize write FSize;
     property TypeKind: TFieldType read FTypeKind write FTypeKind;
     property Kind: string read FKind write FKind;
     property PK: boolean read FPK write FPK default false;
     property NotNull: boolean read FNotNull write FNotNull default false;
     property AutoInc: boolean read FAutoInc write FAutoInc default false;
     property FK: boolean read FFK write FFK default false;
-    property FKChaves: string read FFKChaves write FFKChaves;
-    property ClasseFK: TClass read FClasseFK write FClasseFK;
+    property FieldsFK: string read FFieldsFK write FFieldsFK;
+    property ClassFK: TClass read FClassFK write FClassFK;
 
-    property Owner: TLerClassesRTTI read FoOwner;
+    property Owner: TClassRTTI read FoOwner;
   end;
 
-  TLerClassesRTTI = class
+  TClassRTTI = class
   private
     { private declarations }
     FOwner: TClass;
     FTabela: string;
     FSchema: string;
     FCamposPK: string;
-    FListProperty: TList<TLerClassesProperty>;
-    function GetCamposPK: string;
+    FListProperty: TList<TClassPropertyRTTI>;
+    function GetFieldsPK: string;
   protected
     { protected declarations }
-    procedure LerPropriedades(poType: TRttiType);
-    procedure LerClasse;
+    procedure ReadClassFields(poType: TRttiType);
+    procedure ReadClass;
   public
     { public declarations }
     constructor Create(poOwner: TClass);
     destructor Destroy; override;
 
-    property Tabela: string read FTabela;
+    property Table: string read FTabela;
     property Schema: string read FSchema write FSchema;
-    property Propriedades: TList<TLerClassesProperty> read FListProperty;
-    property CamposPK: string read GetCamposPK;
+    property Fields: TList<TClassPropertyRTTI> read FListProperty;
+    property FieldsPK: string read GetFieldsPK;
   end;
 
 implementation
@@ -75,21 +75,21 @@ implementation
 uses
   SysUtils;
 
-constructor TLerClassesRTTI.Create(poOwner: TClass);
+constructor TClassRTTI.Create(poOwner: TClass);
 begin
   FOwner := poOwner;
-  FListProperty := TList<TLerClassesProperty>.Create;
-  LerClasse;
+  FListProperty := TList<TClassPropertyRTTI>.Create;
+  ReadClass;
 end;
 
-destructor TLerClassesRTTI.Destroy;
+destructor TClassRTTI.Destroy;
 begin
   FreeAndNil(FListProperty);
   FOwner := nil;
   inherited;
 end;
 
-function TLerClassesRTTI.GetCamposPK: string;
+function TClassRTTI.GetFieldsPK: string;
 var
   I: Integer;
 begin
@@ -105,12 +105,12 @@ begin
       if Result <> '' then
         Result := Result + ', ';
 
-      Result := Result + FListProperty.Items[I].CampoBD;
+      Result := Result + FListProperty.Items[I].FieldNameBD;
     end;
   end;
 end;
 
-procedure TLerClassesRTTI.LerClasse;
+procedure TClassRTTI.ReadClass;
 var
   oContext: TRttiContext;
   oType: TRttiType;
@@ -130,32 +130,32 @@ begin
       end;
     end;
 
-    LerPropriedades(oType);
+    ReadClassFields(oType);
   finally
     oContext.Free;
   end;
 end;
 
-procedure TLerClassesRTTI.LerPropriedades(poType: TRttiType);
+procedure TClassRTTI.ReadClassFields(poType: TRttiType);
 var
   oProp: TRttiProperty;
   oAtributo: TCustomAttribute;
-  oPropriedade: TLerClassesProperty;
+  oPropriedade: TClassPropertyRTTI;
 begin
   // lendo propriedades
   for oProp in poType.GetProperties do
   begin
-    oPropriedade := TLerClassesProperty.Create(Self);
+    oPropriedade := TClassPropertyRTTI.Create(Self);
     // nome
-    oPropriedade.Nome := oProp.Name;
+    oPropriedade.FieldName := oProp.Name;
 
     for oAtributo in oProp.GetAttributes do
     begin
       if oAtributo is TCampoBD then
       begin
-        oPropriedade.FCampoBD := TCampoBD(oAtributo).CampoBD;
+        oPropriedade.FFieldNameBD := TCampoBD(oAtributo).CampoBD;
         oPropriedade.Kind     := TCampoBD(oAtributo).Kind;
-        oPropriedade.Tamanho  := TCampoBD(oAtributo).Tamanho;
+        oPropriedade.Size  := TCampoBD(oAtributo).Tamanho;
         oPropriedade.TypeKind := TCampoBD(oAtributo).TypeKind;
       end;
 
@@ -171,8 +171,8 @@ begin
       if oAtributo is TFK then
       begin
         oPropriedade.FK := True;
-        oPropriedade.ClasseFK := TFK(oAtributo).ClasseFK;
-        oPropriedade.FKChaves := TFK(oAtributo).ChaveMultipla;
+        oPropriedade.ClassFK := TFK(oAtributo).ClasseFK;
+        oPropriedade.FieldsFK := TFK(oAtributo).ChaveMultipla;
       end;
     end;
 
@@ -182,7 +182,7 @@ end;
 
 { TLerClassesProperty }
 
-constructor TLerClassesProperty.Create(oOwner: TLerClassesRTTI);
+constructor TClassPropertyRTTI.Create(oOwner: TClassRTTI);
 begin
   FoOwner := oOwner;
 end;

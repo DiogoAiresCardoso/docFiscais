@@ -2,10 +2,10 @@ unit Adapter;
 
 interface
 
-uses Conexao, FireDAC.Comp.Client, Data.DB, FireDAC.Comp.DataSet;
+uses Conexao, FireDAC.Comp.Client, Data.DB, FireDAC.Comp.DataSet, AbstractClass;
 
 type
-  TAdapter = class
+  TAdapter = class(TAbstractClass)
   private
     { private declarations }
     procedure AdapterEntity(const poClass: TClass);
@@ -17,7 +17,6 @@ type
     { public declarations }
     constructor Create;
     destructor Destroy; override;
-
     procedure StartAdapter;
   end;
 
@@ -42,6 +41,9 @@ begin
   oAdapTables := TAdapterTables.Create(oConnection);
   try
     bExecutado := oAdapTables.CreateTable(poClass);
+
+    if bExecutado then
+      oAdapTables.CreateColumn(poClass);
   finally
     if not bExecutado then
       oConnection.Rollback;
@@ -52,21 +54,23 @@ end;
 
 constructor TAdapter.Create;
 begin
+  inherited Create;
   FoConexao := TConexao.Create;
   oConnection := FoConexao.GetConnection;
 end;
 
 destructor TAdapter.Destroy;
 begin
-  oConnection.Free;
-  FoConexao.Free;
+  FreeAndNil(oConnection);
+  FreeAndNil(FoConexao);
+  inherited Destroy;
 end;
 
 procedure TAdapter.StartAdapter;
 begin
   oConnection.StartTransaction;
   try
-    TLogger.InserirLog(Self.ClassName, 'Verificando tabelas');
+    TLogger.InserirLog('Verificando tabelas');
     AdapterEntity(TEmpresasEntity);
     AdapterEntity(TParametros);
     AdapterEntity(TParceirosEntity);

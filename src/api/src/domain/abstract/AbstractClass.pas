@@ -1,10 +1,9 @@
-unit EntityUtils;
+unit AbstractClass;
 
 interface
 
-
 type
-  TEntityUtils<T: constructor> = class
+  TAbstractClass = class abstract
   private
     { private declarations }
   protected
@@ -13,23 +12,22 @@ type
     { public declarations }
     constructor Create;
     destructor Destroy; override;
-
   end;
 
 implementation
 
+{ TAbstractClass }
 
-{ TEntityUtils<T> }
+uses Logger, SysUtils;
 
-constructor TEntityUtils<T>.Create;
+constructor TAbstractClass.Create;
 begin
-
+  TLogger.InserirLog('Iniciando');
 end;
 
-destructor TEntityUtils<T>.Destroy;
+destructor TAbstractClass.Destroy;
 begin
-
-  inherited;
+  TLogger.InserirLog('Finalizado');
 end;
 
 end.

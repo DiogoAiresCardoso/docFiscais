@@ -2,20 +2,17 @@ unit ConfiguracaoBD;
 
 interface
 
-uses Conexao, Logger, Query, LerClassesRTTI, System.Classes, EmpresasEntity, ParceirosEntity, Adapter;
+uses Conexao, Logger, Query, ClassRTTI, System.Classes, EmpresasEntity, ParceirosEntity, Adapter, AbstractClass;
 
 type
-  TConfiguracaoBD = class
+  TConfiguracaoBD = class(TAbstractClass)
   private
     { private declarations }
-    FoConexao: TConexao;
     FoAdapter: TAdapter;
   protected
     { protected declarations }
   public
     { public declarations }
-    constructor Create;
-    destructor Destroy; override;
     function ConfigurarBancoDados: boolean;
   end;
 
@@ -28,26 +25,17 @@ uses
 
 { TConfiguracaoBD }
 
-constructor TConfiguracaoBD.Create;
-begin
-  FoConexao := TConexao.Create;
-  FoAdapter := TAdapter.Create;
-end;
-
-destructor TConfiguracaoBD.Destroy;
-begin
-  FoConexao.Free;
-  FoAdapter.Free;
-  TLogger.InserirLog(Self.ClassName, 'Limpando instancia');
-end;
-
 function TConfiguracaoBD.ConfigurarBancoDados: boolean;
 begin
-  Result := True;
-  TLogger.InserirLog(Self.ClassName + '(VerificarBancoDados)', 'Iniciando');
+  try
+    FoAdapter := TAdapter.Create;
 
+    Result := True;
 
-  FoAdapter.StartAdapter;
+    FoAdapter.StartAdapter;
+  finally
+    FreeAndNil(FoAdapter);
+  end;
 end;
 
 end.
