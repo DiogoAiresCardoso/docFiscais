@@ -104,6 +104,9 @@
         <DCCReference Include="..\src\infra\bd\adapter\AdapterAbstract.pas"/>
         <DCCReference Include="..\src\domain\abstract\AbstractClass.pas"/>
         <DCCReference Include="..\src\modules\endereco\entity\EnderecoEntity.pas"/>
+        <DCCReference Include="..\src\modules\empresas\service\EmpresasService.pas"/>
+        <DCCReference Include="..\src\modules\empresas\repository\EmpresasRepository.pas"/>
+        <DCCReference Include="..\src\modules\generics\repository\GenericRepository.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

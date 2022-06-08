@@ -11,10 +11,12 @@ type
     FoProperties: TClassRTTI;
     FSQLCreateTable: string;
     FsTabela: string;
+    function GetSQLInsert: string;
     { private declarations }
   protected
     { protected declarations }
     // Destined block for CreateTable
+    function CommonString(const poString: string): string;
     function GetFSQLCreateTable: string;
     function MakeFields: string;
     function MakePK: string;
@@ -29,6 +31,7 @@ type
     function SQLCreateColumn(const pnIndex: integer): string;
 
     property SQLCreateTable: string read GetFSQLCreateTable;
+    property SQLInsert: string read GetSQLInsert;
     property Properties: TClassRTTI read FoProperties;
   end;
 
@@ -47,6 +50,14 @@ const
   sCREATECOLUMN = 'ALTER TABLE %s ADD COLUMN IF NOT EXISTS %s %s;';
 
 { TInstructionSQLEntity<T> }
+
+function TInstructionSQLEntity.CommonString(const poString: string): string;
+begin
+  Result := poString;
+
+  if Result <> '' then
+    Result := Result + ', ';
+end;
 
 constructor TInstructionSQLEntity.Create(const poClass: TClass);
 begin
@@ -76,6 +87,24 @@ begin
   FSQLCreateTable := Format(sCREATETABLE, [FsTabela, sFields, sPK, sFK]);
 
   Result := FSQLCreateTable;
+end;
+
+function TInstructionSQLEntity.GetSQLInsert: string;
+var
+  sValues: string;
+  sFields: string;
+  I: Integer;
+begin
+  for I := 0 to Pred(FoProperties.Fields.Count) do
+  begin
+    if not FoProperties.Fields.Items[I].AutoInc then
+    begin
+      sValues := CommonString(sValues) + Format(':%s', [FoProperties.Fields.Items[I].FieldNameBD]);
+      sFields := CommonString(sFields) + FoProperties.Fields.Items[I].FieldNameBD;
+    end;
+  end;
+
+  Result := Format(SQLInsert, [FoProperties.Table, sFields, sValues]);
 end;
 
 function TInstructionSQLEntity.MakeFields: string;

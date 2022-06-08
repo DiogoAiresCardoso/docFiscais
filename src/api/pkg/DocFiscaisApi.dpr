@@ -27,7 +27,10 @@ uses
   AdapterTables in '..\src\infra\bd\adapter\AdapterTables.pas',
   AdapterAbstract in '..\src\infra\bd\adapter\AdapterAbstract.pas',
   AbstractClass in '..\src\domain\abstract\AbstractClass.pas',
-  EnderecoEntity in '..\src\modules\endereco\entity\EnderecoEntity.pas';
+  EnderecoEntity in '..\src\modules\endereco\entity\EnderecoEntity.pas',
+  EmpresasService in '..\src\modules\empresas\service\EmpresasService.pas',
+  EmpresasRepository in '..\src\modules\empresas\repository\EmpresasRepository.pas',
+  GenericRepository in '..\src\modules\generics\repository\GenericRepository.pas';
 
 begin
   try

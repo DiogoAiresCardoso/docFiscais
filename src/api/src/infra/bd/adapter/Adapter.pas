@@ -2,7 +2,7 @@ unit Adapter;
 
 interface
 
-uses Conexao, FireDAC.Comp.Client, Data.DB, FireDAC.Comp.DataSet, AbstractClass;
+uses Conexao, FireDAC.Comp.Client, Data.DB, FireDAC.Comp.DataSet, AbstractClass, DAO;
 
 type
   TAdapter = class(TAbstractClass)
@@ -32,6 +32,7 @@ procedure TAdapter.AdapterEntity(const poClass: TClass);
 var
   oAdapTables: TAdapterTables;
   bExecutado: boolean;
+
 begin
   bExecutado := false;
 
