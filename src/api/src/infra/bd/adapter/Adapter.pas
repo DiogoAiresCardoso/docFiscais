@@ -2,13 +2,15 @@ unit Adapter;
 
 interface
 
-uses Conexao, FireDAC.Comp.Client, Data.DB, FireDAC.Comp.DataSet, AbstractClass, DAO;
+uses Conexao, FireDAC.Comp.Client, Data.DB, FireDAC.Comp.DataSet, AbstractClass, DAO,
+  EmpresasRepository, GenericRepository, TypInfo;
 
 type
   TAdapter = class(TAbstractClass)
   private
     { private declarations }
     procedure AdapterEntity(const poClass: TClass);
+    procedure AdapterInitializeEntity;
   protected
     { protected declarations }
     FoConexao: TConexao;
@@ -53,6 +55,18 @@ begin
   end;
 end;
 
+procedure TAdapter.AdapterInitializeEntity;
+var
+  oEmpresaRepository: TEmpresasRepository;
+begin
+  try
+    oEmpresaRepository := TEmpresasRepository.Create(FoConexao);
+    oEmpresaRepository.ValoresPadroes;
+  finally
+    FreeAndNil(oEmpresaRepository);
+  end;
+end;
+
 constructor TAdapter.Create;
 begin
   inherited Create;
@@ -75,6 +89,8 @@ begin
     AdapterEntity(TEmpresasEntity);
     AdapterEntity(TParametros);
     AdapterEntity(TParceirosEntity);
+
+    AdapterInitializeEntity;
   finally
     if oConnection.InTransaction then
       oConnection.Commit;

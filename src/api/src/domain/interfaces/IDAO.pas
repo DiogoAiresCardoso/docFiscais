@@ -11,7 +11,7 @@ type
     function Insert(var poObject: T): T; overload;
     function Insert(const poObject: TList<T>): TList<T>; overload;
     function Update(const poObject: T): T;
-    function Delete(const poObject: T): T;
+    function Delete(const pnID: integer): boolean;
     function FindAll: TList<T>;
     function FindForID(const pnID: integer): T;
   end;

@@ -30,7 +30,10 @@ src/*.~*
 *.projdata
 *.tvsconfig
 *.dsk
+*.dcu
+*.exe
+*.so
 *.~*
+*.a
 *.stat
 *.bak
-/boss-lock.json

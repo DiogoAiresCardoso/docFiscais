@@ -52,6 +52,7 @@ type
     FSchema: string;
     FCamposPK: string;
     FListProperty: TList<TClassPropertyRTTI>;
+    FAlias: string;
     function GetFieldsPK: string;
   protected
     { protected declarations }
@@ -63,7 +64,8 @@ type
     destructor Destroy; override;
 
     property Table: string read FTabela;
-    property Schema: string read FSchema write FSchema;
+    property Schema: string read FSchema;
+    property Alias: string read FAlias;
     property Fields: TList<TClassPropertyRTTI> read FListProperty;
     property FieldsPK: string read GetFieldsPK;
   end;
@@ -126,7 +128,8 @@ begin
       if oAtributo is TTable then
       begin
         FTabela := TTable(oAtributo).Table;
-        FSchema := TTable(oAtributo).Schema;
+        FAlias := TTable(oAtributo).Alias;
+//        FSchema := TTable(oAtributo).Schema;
       end;
     end;
 
@@ -179,6 +182,7 @@ begin
     FListProperty.Add(oPropriedade);
   end;
 end;
+
 
 { TLerClassesProperty }
 

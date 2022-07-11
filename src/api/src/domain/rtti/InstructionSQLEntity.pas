@@ -12,11 +12,13 @@ type
     FSQLCreateTable: string;
     FsTabela: string;
     function GetSQLInsert: string;
+    function GetSQLFindALL: string;
+    function GetSQLFindID: string;
     { private declarations }
   protected
     { protected declarations }
     // Destined block for CreateTable
-    function CommonString(const poString: string): string;
+    function CommonString(const poString: string; const psConcat: string = ','): string;
     function GetFSQLCreateTable: string;
     function MakeFields: string;
     function MakePK: string;
@@ -32,6 +34,8 @@ type
 
     property SQLCreateTable: string read GetFSQLCreateTable;
     property SQLInsert: string read GetSQLInsert;
+    property SQLFindAll: string read GetSQLFindALL;
+    property SQLFindID: string read GetSQLFindID;
     property Properties: TClassRTTI read FoProperties;
   end;
 
@@ -48,15 +52,17 @@ const
   sUPDATE = 'UPDATE %s SET %s where %s';
   sDELETE = 'DELETE FROM %s where %s';
   sCREATECOLUMN = 'ALTER TABLE %s ADD COLUMN IF NOT EXISTS %s %s;';
+  sFIND = 'select %s from %s';
+  sFINDID = 'select %s from %s where %s';
 
 { TInstructionSQLEntity<T> }
 
-function TInstructionSQLEntity.CommonString(const poString: string): string;
+function TInstructionSQLEntity.CommonString(const poString: string; const psConcat: string): string;
 begin
   Result := poString;
 
   if Result <> '' then
-    Result := Result + ', ';
+    Result := Result + Format('%s ', [psConcat]);
 end;
 
 constructor TInstructionSQLEntity.Create(const poClass: TClass);
@@ -81,12 +87,39 @@ begin
     Exit(FSQLCreateTable);
 
   sFields := MakeFields;
-  sPK := MakePK;
+//  sPK := MakePK;
   sFK := MakeFK;
 
   FSQLCreateTable := Format(sCREATETABLE, [FsTabela, sFields, sPK, sFK]);
 
   Result := FSQLCreateTable;
+end;
+
+function TInstructionSQLEntity.GetSQLFindALL: string;
+var
+  sFields: string;
+  I: integer;
+begin
+  for I := 0 to Pred(FoProperties.Fields.Count) do
+    sFields := CommonString(sFields) + FoProperties.Alias + '.' + FoProperties.Fields.Items[I].FieldNameBD;
+
+  Result := Format(sFIND, [sFields, FoProperties.Table + ' ' + FoProperties.Alias]);
+end;
+
+function TInstructionSQLEntity.GetSQLFindID: string;
+var
+  sFields: string;
+  sWhere: string;
+  I: integer;
+begin
+  for I := 0 to Pred(FoProperties.Fields.Count) do
+  begin
+    sFields := CommonString(sFields) + FoProperties.Alias + '.' + FoProperties.Fields.Items[I].FieldNameBD;
+    if FoProperties.Fields.Items[I].PK then
+      sWhere := CommonString(sWhere, 'and') + Format(' %s.%s = :%s ', [FoProperties.Alias, FoProperties.Fields.Items[I].FieldNameBD, FoProperties.Fields.Items[I].FieldNameBD]);
+  end;
+
+  Result := Format(sFINDID, [sFields, FoProperties.Table + ' ' + FoProperties.Alias, sWhere])
 end;
 
 function TInstructionSQLEntity.GetSQLInsert: string;
@@ -104,7 +137,7 @@ begin
     end;
   end;
 
-  Result := Format(SQLInsert, [FoProperties.Table, sFields, sValues]);
+  Result := Format(sINSERT, [FoProperties.Table, sFields, sValues]);
 end;
 
 function TInstructionSQLEntity.MakeFields: string;
@@ -122,7 +155,8 @@ begin
 
     if oProperty.AutoInc then
     begin
-      sFields := sFields + oProperty.FieldNameBD + ' SERIAL NOT NULL';
+//      sFields := sFields + oProperty.FieldNameBD + ' SERIAL NOT NULL';
+      sFields := sFields + oProperty.FieldNameBD + ' INTEGER PRIMARY KEY AUTOINCREMENT';
       Continue;
     end;
 

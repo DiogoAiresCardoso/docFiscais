@@ -68,5 +68,3 @@ __recovery/
 modules/
 
 # End of https://www.toptal.com/developers/gitignore/api/delphi
-/boss-lock.json
-/BoasPraticasCRUD_N3.res

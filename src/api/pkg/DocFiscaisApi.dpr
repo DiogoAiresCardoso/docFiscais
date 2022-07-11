@@ -30,7 +30,9 @@ uses
   EnderecoEntity in '..\src\modules\endereco\entity\EnderecoEntity.pas',
   EmpresasService in '..\src\modules\empresas\service\EmpresasService.pas',
   EmpresasRepository in '..\src\modules\empresas\repository\EmpresasRepository.pas',
-  GenericRepository in '..\src\modules\generics\repository\GenericRepository.pas';
+  GenericRepository in '..\src\modules\generics\repository\GenericRepository.pas',
+  ParceirosService in '..\src\modules\parceiros\service\ParceirosService.pas',
+  ParceirosRepository in '..\src\modules\parceiros\repository\ParceirosRepository.pas';
 
 begin
   try

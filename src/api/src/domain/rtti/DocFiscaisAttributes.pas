@@ -9,15 +9,17 @@ type
   private
     FTable: string;
     FSchema: string;
+    FAlias: string;
     { private declarations }
   protected
     { protected declarations }
   public
     { public declarations }
-    constructor Create(psName: string; psSchema: string = 'doc');
+    constructor Create(psName: string; psAlias: string; psSchema: string = 'doc');
 
     property Table: string read FTable;
-    property Schema: string read FSchema write FSchema;
+    property Schema: string read FSchema;
+    property Alias: string read FAlias;
   end;
 
   TCampoBD = class(TCustomAttribute)
@@ -60,10 +62,11 @@ uses
   SysUtils;
 
 { TTable }
-constructor TTable.Create(psName: string; psSchema: string);
+constructor TTable.Create(psName: string; psAlias: string; psSchema: string);
 begin
   FTable := psName;
   FSchema := psSchema;
+  FAlias := psAlias;
 end;
 
 { TCampoBD }
@@ -77,12 +80,14 @@ end;
 function TCampoBD.GetKind: string;
 begin
   case FKind of
-    ftString: result := Format('character varying(%s) COLLATE pg_catalog."default"', [IntToStr(FTamanho)]);
+//    ftString: result := Format('character varying(%s) COLLATE pg_catalog."default"', [IntToStr(FTamanho)]);
+    ftString: result := Format('TEXT(%s)', [IntToStr(FTamanho)]);
     ftInteger: result := 'integer';
     ftBoolean: result := 'boolean';
     ftFloat: result := Format('numeric(%s,5)', [IntToStr(FTamanho)]);
     ftBlob: result := 'oid';
-    ftTimeStamp: result := 'time with time zone';
+    ftTimeStamp: result := 'TEXT';
+//    ftTimeStamp: result := 'time with time zone';
   end;
 end;
 

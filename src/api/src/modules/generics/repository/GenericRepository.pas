@@ -29,12 +29,13 @@ type
 
 implementation
 
+uses
+  System.SysUtils;
+
 { TGenericRepository<T> }
 
 constructor TGenericRepository<T>.Create;
 begin
-  inherited Create;
-
   if not Assigned(FoConexao) then
     FoConexao := TConexao.Create;
 
@@ -49,20 +50,18 @@ begin
   FbDetalhe := True;
 end;
 
-function TGenericRepository<T>.Delete(const pnID: integer): boolean;
-begin
-
-end;
-
 destructor TGenericRepository<T>.Destroy;
 begin
+  if not FbDetalhe then
+    FreeAndNil(FoConexao);
 
+  FoDAO := nil;
   inherited;
 end;
 
 function TGenericRepository<T>.FindAll: TList<T>;
 begin
-
+  Result := FoDAO.FindAll;
 end;
 
 function TGenericRepository<T>.FindByFilter(const poFilter: TDictionary<String, Variant>): TList<T>;
@@ -72,17 +71,26 @@ end;
 
 function TGenericRepository<T>.FindByID(const pnID: integer): T;
 begin
-
+  Result := FoDAO.FindForID(pnId);
 end;
 
 function TGenericRepository<T>.Insert(const poObject: T): T;
+var
+  oObject: T;
 begin
+  oObject := poObject;
 
+  Result := FoDAO.Insert(oObject) as T;
 end;
 
 function TGenericRepository<T>.Update(const poObject: T): T;
 begin
+  Result := FoDAO.Update(poObject);
+end;
 
+function TGenericRepository<T>.Delete(const pnID: integer): boolean;
+begin
+  Result := FoDAO.Delete(pnID);
 end;
 
 end.

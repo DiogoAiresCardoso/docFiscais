@@ -6,6 +6,7 @@ uses
   FireDAC.Stan.Intf, FireDAC.Stan.Option, FireDAC.Stan.Error, FireDAC.UI.Intf,
   FireDAC.Phys.Intf, FireDAC.Stan.Def, FireDAC.Stan.Pool, FireDAC.Stan.Async, FireDAC.Phys, FireDAC.VCLUI.Wait,
   FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.DApt, FireDAC.Stan.Param, FireDAC.Phys.PGDef, Vcl.ExtCtrls, FireDAC.Phys.PG,
+  FireDAC.Stan.ExprFuncs, FireDAC.Phys.SQLiteDef, FireDAC.Phys.SQLite,
   Data.DB, FireDAC.Comp.DataSet, FireDAC.Comp.Client, Logger, AbstractClass;
 
 type
@@ -16,6 +17,7 @@ type
     FDConn: TFDConnection;
     FDTransac: TFDTransaction;
     FDPhysPgDriverLink: TFDPhysPgDriverLink;
+    FDPhysSQLiteDriverLink: TFDPhysSQLiteDriverLink;
 
   protected
     { protected declarations }
@@ -36,7 +38,7 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, Vcl.Forms;
 
 
 { TConexao }
@@ -60,21 +62,30 @@ end;
 
 procedure TConexao.ConectarBanco;
 var
-  oParams: TFDPhysPGConnectionDefParams;
+//  oParams: TFDPhysPGConnectionDefParams;
+  oParams: TFDPhysSQLiteConnectionDefParams;
 begin
-  TLogger.InserirLog('Tipo de banco: POSTGRESQL', False);
+//  TLogger.InserirLog('Tipo de banco: POSTGRESQL', False);
+//
+//  oParams := TFDPhysPGConnectionDefParams(FDConn.Params);
+//  oParams.DriverID := 'PG';
+//  oParams.Database := 'documentosFiscais';
+//  oParams.UserName := 'postgres';
+//  oParams.Password := 'postgres';
+//  oParams.Server := '127.0.0.1';
+//  oParams.MetaDefSchema := 'doc';
+//  oParams.MetaCurSchema := 'doc';
+//
 
-  oParams := TFDPhysPGConnectionDefParams(FDConn.Params);
-  oParams.DriverID := 'PG';
-  oParams.Database := 'documentosFiscais';
-  oParams.UserName := 'postgres';
-  oParams.Password := 'postgres';
-  oParams.Server := '127.0.0.1';
-  oParams.MetaDefSchema := 'doc';
-  oParams.MetaCurSchema := 'doc';
 
-  TLogger.InserirLog('Servidor: ' + oParams.Server, False);
-  TLogger.InserirLog('Schema: ' + oParams.MetaDefSchema, False);
+  TLogger.InserirLog('Tipo de banco: SQLite');
+  oParams := TFDPhysSQLiteConnectionDefParams(FDConn.Params);
+  oParams.DriverID := 'SQLite';
+  oParams.Database := 'C:\Users\diogo.cardoso\Documents\docFiscais\bin\docFiscais.sql3';
+
+
+//  TLogger.InserirLog('Servidor: ' + oParams.Server, False);
+//  TLogger.InserirLog('Schema: ' + oParams.MetaDefSchema, False);
   TLogger.InserirLog('Database: ' + oParams.Database, False);
 end;
 
@@ -85,6 +96,7 @@ begin
   FDConn := TFDConnection.Create(nil);
   FDTransac := TFDTransaction.Create(nil);
   FDPhysPgDriverLink := TFDPhysPgDriverLink.Create(nil);
+  FDPhysSQLiteDriverLink := TFDPhysSQLiteDriverLink.Create(nil);
 
   FDConn.BeforeStartTransaction := BeforeStartTransaction;
   FDConn.BeforeCommit := BeforeCommit;

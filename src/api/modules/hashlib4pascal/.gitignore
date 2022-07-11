@@ -106,5 +106,3 @@ lib/
 
 
 # End of https://www.gitignore.io/api/delphi,lazarus,freepascal
-/.travis.install.py
-/.travis.yml

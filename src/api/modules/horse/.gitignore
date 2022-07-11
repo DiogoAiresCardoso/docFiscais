@@ -30,7 +30,11 @@ src/*.~*
 *.projdata
 *.tvsconfig
 *.dsk
+*.dcu
+*.exe
+*.so
 *.~*
+*.a
 *.stat
 *.skincfg
 
@@ -45,4 +49,3 @@ backup/
 **/console/
 **/vcl/
 dunitx-results.xml
-/boss-lock.json

@@ -5,7 +5,7 @@ interface
 uses DocFiscaisAttributes, DB, SimpleAttributes, EmpresasEntity;
 
 type
-  [TTable('parametros')]
+  [TTable('parametros', 'param')]
   TParametros = class
   private
     FnValorChave: Variant;

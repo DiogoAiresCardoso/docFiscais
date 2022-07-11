@@ -5,7 +5,7 @@ interface
 uses DocFiscaisAttributes, DB, SimpleAttributes, GenericEntity, Enums, EmpresasEntity;
 
 type
-  [TTable('parceiros')]
+  [TTable('parceiros', 'par')]
   TParceirosEntity = class(TGenericEntity)
   private
     FCNPJ: string;
@@ -20,7 +20,6 @@ type
     { protected declarations }
   public
     { public declarations }
-    { protected declarations }
     [TCampoBD('id', TFieldType.ftInteger), PK, NotNull, AutoInc]
     property Id: integer read FId write FId;
     [TCampoBD('empresa', TFieldType.ftInteger), PK, TFK(TEmpresasEntity), NotNull]

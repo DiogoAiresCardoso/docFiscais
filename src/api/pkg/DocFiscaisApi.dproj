@@ -45,6 +45,7 @@
         <DCC_Namespace>System;Xml;Data;Datasnap;Web;Soap;Vcl;Vcl.Imaging;Vcl.Touch;Vcl.Samples;Vcl.Shell;$(DCC_Namespace)</DCC_Namespace>
         <SanitizedProjectName>DocFiscaisApi</SanitizedProjectName>
         <DCC_Description>Documentos Fiscais API</DCC_Description>
+        <DCC_UnitSearchPath>C:\Users\diogo.cardoso\Documents\docFiscais\src\api\modules\horse\src;C:\Users\diogo.cardoso\Documents\docFiscais\src\api\modules\simpleorm;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Namespace>Winapi;System.Win;Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
@@ -107,6 +108,8 @@
         <DCCReference Include="..\src\modules\empresas\service\EmpresasService.pas"/>
         <DCCReference Include="..\src\modules\empresas\repository\EmpresasRepository.pas"/>
         <DCCReference Include="..\src\modules\generics\repository\GenericRepository.pas"/>
+        <DCCReference Include="..\src\modules\parceiros\service\ParceirosService.pas"/>
+        <DCCReference Include="..\src\modules\parceiros\repository\ParceirosRepository.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

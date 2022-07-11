@@ -5,7 +5,7 @@ interface
 uses DocFiscaisAttributes, DB, SimpleAttributes, Enums, EnderecoEntity;
 
 type
-  [TTable('empresas')]
+  [TTable('empresas', 'emp')]
   TEmpresasEntity = class(TEnderecoEntity)
   private
     FFantasia: string;

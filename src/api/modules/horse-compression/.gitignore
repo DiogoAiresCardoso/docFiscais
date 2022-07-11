@@ -71,4 +71,3 @@ lib/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
-/boss-lock.json
